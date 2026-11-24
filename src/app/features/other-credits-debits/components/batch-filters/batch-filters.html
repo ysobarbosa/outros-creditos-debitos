@@ -1,0 +1,103 @@
+<mat-expansion-panel [expanded]="true">
+  <mat-expansion-panel-header>
+    <mat-panel-title>Filtros</mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <!-- Institutions -->
+    <mat-form-field>
+      <mat-label>Instituição Resp.</mat-label>
+      <input matInput formControlName="responsibleInstitution" inputmode="numeric" maxlength="4" />
+      @if (controls.responsibleInstitution.hasError('pattern')) {
+        <mat-error>Informe até 4 dígitos numéricos.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Instituição</mat-label>
+      <input matInput formControlName="institution" inputmode="numeric" maxlength="4" />
+      @if (controls.institution.hasError('pattern')) {
+        <mat-error>Informe até 4 dígitos numéricos.</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Status -->
+    <mat-form-field>
+      <mat-label>Situação Lote</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="ALL">Todas</mat-option>
+        @for (option of statusOptions; track option.value) {
+          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <!-- ID range -->
+    <fieldset formGroupName="idRange">
+      <legend>ID Lote</legend>
+      <mat-form-field>
+        <mat-label>De</mat-label>
+        <input matInput type="number" formControlName="from" [errorStateMatcher]="rangeMatcher" />
+        @if (controls.idRange.controls.from.hasError('min')) {
+          <mat-error>Deve ser maior que zero.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Até</mat-label>
+        <input matInput type="number" formControlName="to" [errorStateMatcher]="rangeMatcher" />
+        @if (controls.idRange.hasError('invalidRange')) {
+          <mat-error>"Até" deve ser maior ou igual a "De".</mat-error>
+        } @else if (controls.idRange.controls.to.hasError('min')) {
+          <mat-error>Deve ser maior que zero.</mat-error>
+        }
+      </mat-form-field>
+    </fieldset>
+
+    <!-- Amount range -->
+    <fieldset formGroupName="amountRange">
+      <legend>Valor Lote</legend>
+      <mat-form-field>
+        <mat-label>De</mat-label>
+        <input matInput type="number" step="0.01" formControlName="from" [errorStateMatcher]="rangeMatcher" />
+        @if (controls.amountRange.controls.from.hasError('min')) {
+          <mat-error>Não pode ser negativo.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Até</mat-label>
+        <input matInput type="number" step="0.01" formControlName="to" [errorStateMatcher]="rangeMatcher" />
+        @if (controls.amountRange.hasError('invalidRange')) {
+          <mat-error>"Até" deve ser maior ou igual a "De".</mat-error>
+        } @else if (controls.amountRange.controls.to.hasError('min')) {
+          <mat-error>Não pode ser negativo.</mat-error>
+        }
+      </mat-form-field>
+    </fieldset>
+
+    <!-- Date range -->
+    <mat-form-field>
+      <mat-label>Data Entrada</mat-label>
+      <mat-date-range-input formGroupName="dateRange" [rangePicker]="picker">
+        <input matStartDate formControlName="from" placeholder="De" />
+        <input matEndDate formControlName="to" placeholder="Até" />
+      </mat-date-range-input>
+      <mat-hint>DD/MM/AAAA – DD/MM/AAAA</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="picker" />
+      <mat-date-range-picker #picker />
+
+      @if (controls.dateRange.controls.from.hasError('matDatepickerParse') ||
+           controls.dateRange.controls.to.hasError('matDatepickerParse')) {
+        <mat-error>Data inválida.</mat-error>
+      } @else if (controls.dateRange.hasError('invalidRange') ||
+                  controls.dateRange.controls.to.hasError('matEndDateInvalid')) {
+        <mat-error>A data final deve ser igual ou posterior à inicial.</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Actions -->
+    <div>
+      <button mat-button type="button" (click)="clear()">Limpar</button>
+      <button mat-flat-button type="submit" [disabled]="loading()">Pesquisar</button>
+    </div>
+  </form>
+</mat-expansion-panel>
