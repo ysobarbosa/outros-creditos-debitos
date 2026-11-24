@@ -1,6 +1,6 @@
-export type StatusEntry = 'PENDING' | 'PROCESSED' | 'REJECTED';
+export type EntryStatus = 'PENDING' | 'PROCESSED' | 'REJECTED';
 
-export const ENTRY_STATUS_LABEL: Record<StatusEntry, string> = {
+export const ENTRY_STATUS_LABEL: Record<EntryStatus, string> = {
   PENDING: 'Pendente',
   PROCESSED: 'Processado',
   REJECTED: 'Rejeitado',
@@ -8,16 +8,18 @@ export const ENTRY_STATUS_LABEL: Record<StatusEntry, string> = {
 
 export interface BatchEntry {
   id: number;
+  batchId: number;
   accountNumber: string;
   accountOwner: string;
-  value: number;
-  batchId: number;
+  amount: number;
   historyId: number;
   isReversal: boolean;
-  document: string | null;
+  document: string;
   description: string | null;
-  status: StatusEntry;
-  branch: string | null;    
+  status: EntryStatus;
+  /** PA (Posto de Atendimento) */
+  branch: string | null;
 }
 
-export type NewEntry = Omit<BatchEntry, 'id' | 'status'>;
+/** Form payload: id, batchId and status are assigned by the service. */
+export type NewBatchEntry = Omit<BatchEntry, 'id' | 'batchId' | 'status'>;
