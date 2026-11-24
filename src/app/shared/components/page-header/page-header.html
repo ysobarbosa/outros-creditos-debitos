@@ -1,0 +1,20 @@
+<header>
+  <h1>{{ title() }}</h1>
+
+  @if (breadcrumbs().length > 0) {
+    <nav aria-label="Trilha de navegação">
+      <ol>
+        @for (item of breadcrumbs(); track item.label; let last = $last) {
+          <li>
+            @if (last || !item.href) {
+              <span [attr.aria-current]="last ? 'page' : null">{{ item.label }}</span>
+            } @else {
+              <a [href]="item.href">{{ item.label }}</a>
+            }
+          </li>
+        }
+      </ol>
+    </nav>
+  }
+</header>
+
