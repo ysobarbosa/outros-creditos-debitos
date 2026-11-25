@@ -2,7 +2,11 @@
 
 <app-batch-filters [loading]="loading()" (filterApplied)="onFilterApplied($event)" />
 
-<!-- Step 8: actions -->
+<app-batch-actions
+  [selected]="selected()"
+  [busy]="acting() || loading()"
+  (actionTriggered)="onAction($event)"
+/>
 
 <section aria-label="Resultados da pesquisa" [attr.aria-busy]="loading()">
   @if (loading()) {
@@ -12,22 +16,20 @@
   @if (error(); as message) {
     <div role="alert">
       <p>{{ message }}</p>
-      <button mat-stroked-button type="button" (click)="retry()">Tentar novamente</button>
+      <button mat-stroked-button type="button" (click)="refresh()">Tentar novamente</button>
     </div>
   }
 
-  <app-batch-table [batches]="batches()"  [(selected)]="selected" />
+  <app-batch-table [batches]="batches()" [(selected)]="selected" />
 
- <mat-paginator
-  [length]="total()"
-  [pageIndex]="page().pageIndex"
-  [pageSize]="page().pageSize"
-  [pageSizeOptions]="pageSizeOptions"
-  [disabled]="loading()"
-  showFirstLastButtons
-  aria-label="Paginação de lotes"
-  (page)="onPageChange($event)"
-/>
-
-<p>{{ selected().length }} lote(s) selecionado(s)</p>
+  <mat-paginator
+    [length]="total()"
+    [pageIndex]="page().pageIndex"
+    [pageSize]="page().pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    [disabled]="loading()"
+    showFirstLastButtons
+    aria-label="Paginação de lotes"
+    (page)="onPageChange($event)"
+  />
 </section>
