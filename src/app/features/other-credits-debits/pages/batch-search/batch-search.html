@@ -1,3 +1,22 @@
 <app-page-header title="Outros Créditos/Débitos" [breadcrumbs]="breadcrumbs" />
 
-<app-batch-filters (filterApplied)="onFilterApplied($event)" />
+<app-batch-filters [loading]="loading()" (filterApplied)="onFilterApplied($event)" />
+
+<!-- Step 8: actions -->
+
+<section aria-label="Resultados da pesquisa" [attr.aria-busy]="loading()">
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Carregando lotes" />
+  }
+
+  @if (error(); as message) {
+    <div role="alert">
+      <p>{{ message }}</p>
+      <button mat-stroked-button type="button" (click)="retry()">Tentar novamente</button>
+    </div>
+  }
+
+  <app-batch-table [batches]="batches()" />
+
+  <p>{{ total() }} lote(s) encontrado(s)</p>
+</section>
