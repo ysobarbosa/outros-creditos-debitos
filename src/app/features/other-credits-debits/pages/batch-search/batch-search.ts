@@ -1,14 +1,18 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { catchError, debounceTime, of, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, of, switchMap, tap, Observable, filter, finalize } from 'rxjs';
 import { Batch, BatchFilter, PageRequest, PageResult, createEmptyBatchFilter } from '../../../../core/models';
 import { BatchService } from '../../../../core/services/batch.service';
 import { Breadcrumb, PageHeader } from '../../../../shared/components/page-header/page-header';
 import { BatchFilters } from '../../components/batch-filters/batch-filters';
 import { BatchTable } from '../../components/batch-table/batch-table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { BatchAction, BatchActions } from '../../components/batch-actions/batch-actions';
+import { ConfirmDialog, ConfirmDialogData } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 
 interface SearchQuery {
   filter: BatchFilter;
@@ -21,7 +25,7 @@ const EMPTY_RESULT: PageResult<Batch> = { items: [], total: 0 };
 
 @Component({
   selector: 'app-batch-search',
-  imports: [PageHeader, BatchFilters, BatchTable, MatProgressBarModule, MatButtonModule, MatPaginatorModule],
+  imports: [PageHeader, BatchFilters, BatchTable, MatProgressBarModule, MatButtonModule, MatPaginatorModule, BatchActions],
   templateUrl: './batch-search.html',
   styleUrl: './batch-search.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,7 +38,12 @@ export class BatchSearch {
     { label: 'Outros Créditos/Débitos' },
   ];
 
-  // State
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly destroyRef = inject(DestroyRef);
+
+  protected readonly acting = signal(false);
+
   private readonly query = signal<SearchQuery>({
     filter: createEmptyBatchFilter(),
     page: INITIAL_PAGE,
@@ -70,7 +79,16 @@ export class BatchSearch {
         takeUntilDestroyed(),
       )
       .subscribe((result) => {
+        const { pageIndex, pageSize } = this.query().page;
+        const lastPage = Math.max(0, Math.ceil(result.total / pageSize) - 1);
+
+        if (result.items.length === 0 && pageIndex > lastPage) {
+          this.query.update((current) => ({ ...current, page: { ...current.page, pageIndex: lastPage } }));
+          return;
+        }
+
         this.result.set(result);
+        this.selected.set([]);
         this.loading.set(false);
       });
   }
@@ -79,18 +97,83 @@ export class BatchSearch {
     this.query.update((current) => ({ filter, page: { ...current.page, pageIndex: 0 } }));
   }
 
-  protected retry(): void {
+  protected refresh(): void {
     this.query.update((current) => ({ ...current }));
   }
 
   protected onPageChange(event: PageEvent): void {
-  this.query.update((current) => ({
-    ...current,
-    page: { pageIndex: event.pageIndex, pageSize: event.pageSize },
-  }));
-}
+    this.query.update((current) => ({
+      ...current,
+      page: { pageIndex: event.pageIndex, pageSize: event.pageSize },
+    }));
+  }
+
+  protected onAction(action: BatchAction): void {
+    const selected = this.selected();
+    const ids = selected.map((batch) => batch.id);
+
+    switch (action) {
+      case 'send':
+        return this.runAction(this.batchService.send(ids), 'Lote(s) enviado(s) com sucesso.');
+      case 'confirm':
+        return this.runAction(this.batchService.confirm(ids), 'Lote(s) confirmado(s) com sucesso.');
+      case 'delete':
+        return this.confirmDelete(selected[0]);
+      case 'create':
+      case 'edit':
+        return this.notify('Disponível na próxima etapa.'); // Step 9
+      case 'view':
+      case 'viewJustification':
+        return this.notify('Funcionalidade fora do escopo deste desafio.');
+      default:
+        return assertNever(action);
+    }
+  }
+
+  private confirmDelete(batch: Batch): void {
+    const request$ = this.dialog
+      .open<ConfirmDialog, ConfirmDialogData, boolean>(ConfirmDialog, {
+        data: {
+          title: 'Excluir lote',
+          message: `Deseja excluir o lote ${batch.id}? Esta ação não pode ser desfeita.`,
+          confirmLabel: 'Excluir',
+        },
+      })
+      .afterClosed()
+      .pipe(
+        filter((confirmed): confirmed is true => confirmed === true),
+        switchMap(() => this.batchService.remove(batch.id)),
+      );
+
+    this.runAction(request$, `Lote ${batch.id} excluído com sucesso.`);
+  }
+
+  private runAction(request$: Observable<unknown>, successMessage: string): void {
+    this.acting.set(true);
+    request$
+      .pipe(
+        finalize(() => this.acting.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          this.notify(successMessage);
+          this.refresh();
+        },
+        error: (err: unknown) => this.notify(toErrorMessage(err)),
+      });
+  }
+
+
+  private notify(message: string): void {
+    this.snackBar.open(message, 'Fechar', { duration: 4000 });
+  }
 }
 
 function toErrorMessage(err: unknown): string {
   return err instanceof Error ? err.message : 'Ocorreu um erro inesperado.';
+}
+
+function assertNever(value: never): never {
+  throw new Error(`Unhandled action: ${String(value)}`);
 }

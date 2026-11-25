@@ -1,0 +1,25 @@
+<div role="group" aria-label="Ações dos lotes">
+  <button mat-stroked-button type="button" [disabled]="busy() || !canConfirm()" (click)="trigger('confirm')">
+    Confirmar
+  </button>
+  <button mat-stroked-button type="button" [disabled]="busy() || !canSend()" (click)="trigger('send')">
+    Enviar
+  </button>
+  <button mat-stroked-button type="button" [disabled]="busy() || !hasSingle()" (click)="trigger('viewJustification')">
+    Visualizar Justificativa
+  </button>
+  <button mat-flat-button type="button" [disabled]="busy()" (click)="trigger('create')">
+    Incluir
+  </button>
+  <button mat-stroked-button type="button" [disabled]="busy() || !hasSingle()" (click)="trigger('edit')">
+    Alterar
+  </button>
+  <button mat-stroked-button type="button" [disabled]="busy() || !hasSingle()" (click)="trigger('delete')">
+    Excluir
+  </button>
+  <button mat-stroked-button type="button" [disabled]="busy() || !hasSingle()" (click)="trigger('view')">
+    Visualizar
+  </button>
+
+  <span aria-live="polite">{{ count() }} lote(s) selecionado(s)</span>
+</div>
