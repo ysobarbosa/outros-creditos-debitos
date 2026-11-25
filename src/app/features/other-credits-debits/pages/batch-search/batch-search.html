@@ -16,7 +16,18 @@
     </div>
   }
 
-  <app-batch-table [batches]="batches()" />
+  <app-batch-table [batches]="batches()"  [(selected)]="selected" />
 
-  <p>{{ total() }} lote(s) encontrado(s)</p>
+ <mat-paginator
+  [length]="total()"
+  [pageIndex]="page().pageIndex"
+  [pageSize]="page().pageSize"
+  [pageSizeOptions]="pageSizeOptions"
+  [disabled]="loading()"
+  showFirstLastButtons
+  aria-label="Paginação de lotes"
+  (page)="onPageChange($event)"
+/>
+
+<p>{{ selected().length }} lote(s) selecionado(s)</p>
 </section>

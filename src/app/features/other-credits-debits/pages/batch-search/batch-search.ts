@@ -8,6 +8,7 @@ import { BatchService } from '../../../../core/services/batch.service';
 import { Breadcrumb, PageHeader } from '../../../../shared/components/page-header/page-header';
 import { BatchFilters } from '../../components/batch-filters/batch-filters';
 import { BatchTable } from '../../components/batch-table/batch-table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 interface SearchQuery {
   filter: BatchFilter;
@@ -20,7 +21,7 @@ const EMPTY_RESULT: PageResult<Batch> = { items: [], total: 0 };
 
 @Component({
   selector: 'app-batch-search',
-  imports: [PageHeader, BatchFilters, BatchTable, MatProgressBarModule, MatButtonModule],
+  imports: [PageHeader, BatchFilters, BatchTable, MatProgressBarModule, MatButtonModule, MatPaginatorModule],
   templateUrl: './batch-search.html',
   styleUrl: './batch-search.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,6 +46,10 @@ export class BatchSearch {
   // Derived state
   protected readonly batches = computed(() => this.result().items);
   protected readonly total = computed(() => this.result().total);
+  protected readonly page = computed(() => this.query().page);
+  protected readonly pageSizeOptions = [10, 25, 50];
+
+  protected readonly selected = signal<readonly Batch[]>([]);
 
   constructor() {
     toObservable(this.query)
@@ -77,6 +82,13 @@ export class BatchSearch {
   protected retry(): void {
     this.query.update((current) => ({ ...current }));
   }
+
+  protected onPageChange(event: PageEvent): void {
+  this.query.update((current) => ({
+    ...current,
+    page: { pageIndex: event.pageIndex, pageSize: event.pageSize },
+  }));
+}
 }
 
 function toErrorMessage(err: unknown): string {

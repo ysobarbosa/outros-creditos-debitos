@@ -1,4 +1,22 @@
 <table mat-table [dataSource]="batches()" [trackBy]="trackById" aria-label="Lotes">
+    <ng-container matColumnDef="select">
+  <th mat-header-cell *matHeaderCellDef>
+    <mat-checkbox
+      [checked]="allSelected()"
+      [indeterminate]="someSelected()"
+      [disabled]="batches().length === 0"
+      aria-label="Selecionar todos os lotes da página"
+      (change)="toggleAll()"
+    />
+  </th>
+  <td mat-cell *matCellDef="let batch">
+    <mat-checkbox
+      [checked]="selectedIds().has(batch.id)"
+      [aria-label]="'Selecionar lote ' + batch.id"
+      (change)="toggle(batch)"
+    />
+  </td>
+</ng-container>
   <ng-container matColumnDef="id">
     <th mat-header-cell *matHeaderCellDef scope="col">ID Lote</th>
     <td mat-cell *matCellDef="let batch">{{ batch.id }}</td>
@@ -40,7 +58,12 @@
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="columns"></tr>
-  <tr mat-row *matRowDef="let row; columns: columns"></tr>
+  <tr
+  mat-row
+  *matRowDef="let row; columns: columns"
+  [class.is-selected]="selectedIds().has(row.id)"
+  [attr.aria-selected]="selectedIds().has(row.id)"
+></tr>
 
   <tr *matNoDataRow>
     <td [attr.colspan]="columns.length">Nenhum lote encontrado.</td>
