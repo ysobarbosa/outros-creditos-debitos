@@ -1,0 +1,41 @@
+:root {
+  /* Brand: verde-petróleo */
+  --color-primary: #00626b;
+  --color-primary-dark: #00474e;
+  --color-primary-light: #e3f1f2;
+  --color-primary-contrast: #ffffff;
+
+  /* Neutrals */
+  --color-bg: #f4f6f7;
+  --color-surface: #ffffff;
+  --color-border: #d5dde0;
+  --color-text: #1f2a2e;
+  --color-text-muted: #5f6f74;
+
+  /* Feedback */
+  --color-error: #b3261e;
+  --color-error-bg: #fdecea;
+  --color-success: #1e6b2a;
+  --color-success-bg: #e6f4ea;
+  --color-warning: #8a5300;
+  --color-warning-bg: #fff4e0;
+
+  /* Spacing (4px scale) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Shape and elevation */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.12);
+
+  /* Typography */
+  --font-family: Roboto, 'Helvetica Neue', sans-serif;
+  --font-size-sm: 0.8125rem;
+  --font-size-md: 0.875rem;
+  --font-size-lg: 1.25rem;
+}
