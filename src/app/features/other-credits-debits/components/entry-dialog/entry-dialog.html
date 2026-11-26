@@ -1,0 +1,112 @@
+<h2 mat-dialog-title>Incluir Lançamento — Lote {{ data.batch.id }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="addEntry()" novalidate>
+  <mat-dialog-content>
+    <!-- Conta Corrente -->
+    <section class="dialog-section" aria-labelledby="section-account">
+      <h3 id="section-account">Conta Corrente</h3>
+
+      <div class="dialog-grid">
+        <mat-form-field>
+          <mat-label>Conta Corrente</mat-label>
+          <input
+            matInput
+            formControlName="accountNumber"
+            inputmode="numeric"
+            maxlength="5"
+            (keydown.enter)="$event.preventDefault(); searchAccount()"
+          />
+          @if (searchingAccount()) {
+            <mat-spinner matIconSuffix diameter="20" aria-label="Pesquisando conta" />
+          } @else {
+            <button
+              mat-icon-button
+              matIconSuffix
+              type="button"
+              aria-label="Pesquisar conta corrente"
+              (click)="searchAccount()"
+            >
+              <mat-icon>search</mat-icon>
+            </button>
+          }
+          <mat-hint>5 dígitos. Use a lupa ou Enter para localizar.</mat-hint>
+          <mat-error>{{ messageFor(controls.accountNumber) }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="span-2">
+          <mat-label>Titular</mat-label>
+          <input matInput formControlName="accountOwner" readonly tabindex="-1" />
+          @if (isInvalid(controls.accountOwner)) {
+            <mat-error>Localize a conta corrente pela lupa.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Valor</mat-label>
+          
+          <input matInput appCurrencyInput formControlName="amount" />
+          <mat-error>{{ messageFor(controls.amount) }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Histórico</mat-label>
+          <mat-select formControlName="historyId">
+            @for (option of historyOptions; track option.value) {
+              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+          <mat-error>{{ messageFor(controls.historyId) }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Documento</mat-label>
+          <input matInput formControlName="document" maxlength="20" />
+          <mat-error>{{ messageFor(controls.document) }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Situação</mat-label>
+          <input matInput [value]="pendingLabel" readonly tabindex="-1" />
+        </mat-form-field>
+
+        <mat-checkbox formControlName="isReversal" class="dialog-checkbox">Estorno</mat-checkbox>
+
+        <mat-form-field class="span-full">
+          <mat-label>Descrição</mat-label>
+          <textarea matInput formControlName="description" rows="3" maxlength="200"></textarea>
+          <mat-hint align="end">{{ controls.description.value?.length ?? 0 }}/200</mat-hint>
+          <mat-error>{{ messageFor(controls.description) }}</mat-error>
+        </mat-form-field>
+      </div>
+    </section>
+
+    <!-- Documento CSC -->
+    <section class="dialog-section" aria-labelledby="section-csc">
+      <h3 id="section-csc">Documento CSC</h3>
+
+      <div class="dialog-grid">
+        <mat-form-field>
+          <mat-label>PA</mat-label>
+          <mat-select formControlName="branch">
+            <mat-option [value]="null">Nenhum</mat-option>
+            @for (option of branchOptions; track option.value) {
+              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </section>
+
+    @if (error(); as message) {
+      <p class="dialog-error" role="alert">{{ message }}</p>
+    }
+
+    <!-- Step 10: entries grid -->
+    <p class="dialog-summary" aria-live="polite">{{ entries().length }} lançamento(s) neste lote.</p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="close()">Fechar</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">Incluir</button>
+  </mat-dialog-actions>
+</form>
