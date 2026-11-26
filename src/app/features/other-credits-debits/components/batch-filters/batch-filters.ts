@@ -9,6 +9,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { CurrencyInputDirective } from '../../../../shared/directives/currency-input.directive';
 
 const INSTITUTION_PATTERN = /^\d{1,4}$/;
 @Component({
@@ -20,6 +21,7 @@ const INSTITUTION_PATTERN = /^\d{1,4}$/;
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    CurrencyInputDirective,
   ],
   selector: 'app-batch-filters',
   styleUrl: './batch-filters.scss',
