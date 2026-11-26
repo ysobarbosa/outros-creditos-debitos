@@ -1,35 +1,41 @@
-<app-page-header title="Outros Créditos/Débitos" [breadcrumbs]="breadcrumbs" />
+<div class="batch-search">
+  <app-page-header title="Outros Créditos/Débitos" [breadcrumbs]="breadcrumbs" />
 
-<app-batch-filters [loading]="loading()" (filterApplied)="onFilterApplied($event)" />
+  <div class="batch-search__body">
+    <app-batch-filters [loading]="loading()" (filterApplied)="onFilterApplied($event)" />
 
-<app-batch-actions
-  [selected]="selected()"
-  [busy]="acting() || loading()"
-  (actionTriggered)="onAction($event)"
-/>
+    <app-batch-actions
+      [selected]="selected()"
+      [busy]="acting() || loading()"
+      (actionTriggered)="onAction($event)"
+    />
 
-<section aria-label="Resultados da pesquisa" [attr.aria-busy]="loading()">
-  @if (loading()) {
-    <mat-progress-bar mode="indeterminate" aria-label="Carregando lotes" />
-  }
+    <section class="results" aria-label="Resultados da pesquisa" [attr.aria-busy]="loading()">
+      <div class="results__progress">
+        @if (loading()) {
+          <mat-progress-bar mode="indeterminate" aria-label="Carregando lotes" />
+        }
+      </div>
 
-  @if (error(); as message) {
-    <div role="alert">
-      <p>{{ message }}</p>
-      <button mat-stroked-button type="button" (click)="refresh()">Tentar novamente</button>
-    </div>
-  }
+      @if (error(); as message) {
+        <div class="results__error" role="alert">
+          <p>{{ message }}</p>
+          <button mat-stroked-button type="button" (click)="refresh()">Tentar novamente</button>
+        </div>
+      }
 
-  <app-batch-table [batches]="batches()" [(selected)]="selected" />
+      <app-batch-table [batches]="batches()" [(selected)]="selected" />
 
-  <mat-paginator
-    [length]="total()"
-    [pageIndex]="page().pageIndex"
-    [pageSize]="page().pageSize"
-    [pageSizeOptions]="pageSizeOptions"
-    [disabled]="loading()"
-    showFirstLastButtons
-    aria-label="Paginação de lotes"
-    (page)="onPageChange($event)"
-  />
-</section>
+      <mat-paginator
+        [length]="total()"
+        [pageIndex]="page().pageIndex"
+        [pageSize]="page().pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [disabled]="loading()"
+        showFirstLastButtons
+        aria-label="Paginação de lotes"
+        (page)="onPageChange($event)"
+      />
+    </section>
+  </div>
+</div>

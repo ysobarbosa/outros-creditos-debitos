@@ -3,7 +3,7 @@
     <mat-panel-title>Filtros</mat-panel-title>
   </mat-expansion-panel-header>
 
-  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="filters-form">
     <!-- Institutions -->
     <mat-form-field>
       <mat-label>Instituição Resp.</mat-label>
@@ -75,27 +75,30 @@
     </fieldset>
 
     <!-- Date range -->
-    <mat-form-field>
-      <mat-label>Data Entrada</mat-label>
-      <mat-date-range-input formGroupName="dateRange" [rangePicker]="picker">
-        <input matStartDate formControlName="from" placeholder="De" />
-        <input matEndDate formControlName="to" placeholder="Até" />
-      </mat-date-range-input>
-      <mat-hint>DD/MM/AAAA – DD/MM/AAAA</mat-hint>
-      <mat-datepicker-toggle matIconSuffix [for]="picker" />
-      <mat-date-range-picker #picker />
+    <fieldset>
+  <legend>Data Entrada</legend>
+  <mat-form-field class="date-range-field">
+    <mat-label>Período</mat-label>
+    <mat-date-range-input formGroupName="dateRange" [rangePicker]="picker">
+      <input matStartDate formControlName="from" placeholder="De" />
+      <input matEndDate formControlName="to" placeholder="Até" />
+    </mat-date-range-input>
+    <mat-hint>DD/MM/AAAA – DD/MM/AAAA</mat-hint>
+    <mat-datepicker-toggle matIconSuffix [for]="picker" />
+    <mat-date-range-picker #picker />
 
-      @if (controls.dateRange.controls.from.hasError('matDatepickerParse') ||
-           controls.dateRange.controls.to.hasError('matDatepickerParse')) {
-        <mat-error>Data inválida.</mat-error>
-      } @else if (controls.dateRange.hasError('invalidRange') ||
-                  controls.dateRange.controls.to.hasError('matEndDateInvalid')) {
-        <mat-error>A data final deve ser igual ou posterior à inicial.</mat-error>
-      }
-    </mat-form-field>
+    @if (controls.dateRange.controls.from.hasError('matDatepickerParse') ||
+         controls.dateRange.controls.to.hasError('matDatepickerParse')) {
+      <mat-error>Data inválida.</mat-error>
+    } @else if (controls.dateRange.hasError('invalidRange') ||
+                controls.dateRange.controls.to.hasError('matEndDateInvalid')) {
+      <mat-error>A data final deve ser igual ou posterior à inicial.</mat-error>
+    }
+  </mat-form-field>
+</fieldset>
 
     <!-- Actions -->
-    <div>
+    <div class="filters-actions">
       <button mat-button type="button" (click)="clear()">Limpar</button>
       <button mat-flat-button type="submit" [disabled]="loading()">Pesquisar</button>
     </div>

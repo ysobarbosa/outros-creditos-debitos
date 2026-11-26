@@ -1,0 +1,59 @@
+:host {
+  display: block;
+  overflow-x: auto;
+}
+
+.batches-table {
+  width: 100%;
+  min-width: 960px;
+}
+
+th {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+td {
+  white-space: nowrap;
+}
+
+.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+tr.is-selected td {
+  background: var(--color-primary-light);
+}
+
+tr:hover td {
+  background: color-mix(in srgb, var(--color-primary-light) 60%, transparent);
+}
+
+.status {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  background: var(--color-border);
+  color: var(--color-text);
+
+  &[data-status='SENT'] {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+  }
+
+  &[data-status='CONFIRMED'] {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+  }
+}
+
+.no-data {
+  padding: var(--space-5);
+  text-align: center;
+  color: var(--color-text-muted);
+}

@@ -1,6 +1,6 @@
 import { Component, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
-import { BATCH_STATUS_OPTIONS, BatchFilter } from '../../../../core/models';
+import { BATCH_STATUS_OPTIONS, BatchFilter, BatchStatusFilter } from '../../../../core/models';
 import { RangeErrorStateMatcher } from '../../../../shared/forms/range-error-state-matcher';
 import { rangeValidator } from '../../../../shared/validators/range.validator';
 import { MatButtonModule } from '@angular/material/button';
@@ -37,7 +37,7 @@ export class BatchFilters {
   protected readonly form = this.formBuilder.group({
     responsibleInstitution: this.formBuilder.control<string | null>(null, Validators.pattern(INSTITUTION_PATTERN)),
     institution: this.formBuilder.control<string | null>(null, Validators.pattern(INSTITUTION_PATTERN)),
-    status: this.formBuilder.control<string | null>(null),
+    status: this.formBuilder.control<BatchStatusFilter>('ALL'),
     idRange: this.rangeGroup<number>(Validators.min(1)),
     amountRange: this.rangeGroup<number>(Validators.min(0)),
     dateRange: this.rangeGroup<Date>(),

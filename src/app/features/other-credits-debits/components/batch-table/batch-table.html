@@ -1,4 +1,4 @@
-<table mat-table [dataSource]="batches()" [trackBy]="trackById" aria-label="Lotes">
+<table class="batches-table" mat-table [dataSource]="batches()" [trackBy]="trackById" aria-label="Lotes">
     <ng-container matColumnDef="select">
   <th mat-header-cell *matHeaderCellDef>
     <mat-checkbox
@@ -28,13 +28,13 @@
   </ng-container>
 
   <ng-container matColumnDef="amount">
-    <th mat-header-cell *matHeaderCellDef scope="col">Valor</th>
-    <td mat-cell *matCellDef="let batch">{{ batch.amount | currency: 'BRL' }}</td>
+    <th mat-header-cell *matHeaderCellDef scope="col" class="numeric">Valor</th>
+    <td mat-cell *matCellDef="let batch" class="numeric">{{ batch.amount | currency: 'BRL' }}</td>
   </ng-container>
 
   <ng-container matColumnDef="entryCount">
-    <th mat-header-cell *matHeaderCellDef scope="col">Quant. Lançamentos</th>
-    <td mat-cell *matCellDef="let batch">{{ batch.entryCount }}</td>
+    <th class="numeric" mat-header-cell *matHeaderCellDef scope="col">Quant. Lançamentos</th>
+    <td class="numeric" mat-cell *matCellDef="let batch">{{ batch.entryCount }}</td>
   </ng-container>
 
   <ng-container matColumnDef="createdBy">
@@ -49,7 +49,7 @@
 
   <ng-container matColumnDef="status">
     <th mat-header-cell *matHeaderCellDef scope="col">Situação Lote</th>
-    <td mat-cell *matCellDef="let batch">{{ batch.status | batchStatusLabel }}</td>
+    <td mat-cell *matCellDef="let batch"> <span class="status" [attr.data-status]="batch.status">{{ batch.status | batchStatusLabel }}</span></td>
   </ng-container>
 
   <ng-container matColumnDef="statusChangedAt">
@@ -65,7 +65,7 @@
   [attr.aria-selected]="selectedIds().has(row.id)"
 ></tr>
 
-  <tr *matNoDataRow>
-    <td [attr.colspan]="columns.length">Nenhum lote encontrado.</td>
-  </tr>
+<tr *matNoDataRow>
+  <td class="no-data" [attr.colspan]="columns.length">Nenhum lote encontrado.</td>
+</tr>
 </table>
