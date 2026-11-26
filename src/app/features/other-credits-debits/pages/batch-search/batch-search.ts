@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal, DestroyRe
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { catchError, debounceTime, of, switchMap, tap, Observable, filter, finalize } from 'rxjs';
+import { catchError, debounceTime, of, switchMap, tap, Observable, filter, finalize, ignoreElements, map } from 'rxjs';
 import { Batch, BatchFilter, PageRequest, PageResult, createEmptyBatchFilter } from '../../../../core/models';
 import { BatchService } from '../../../../core/services/batch.service';
 import { Breadcrumb, PageHeader } from '../../../../shared/components/page-header/page-header';
@@ -13,6 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BatchAction, BatchActions } from '../../components/batch-actions/batch-actions';
 import { ConfirmDialog, ConfirmDialogData } from '../../../../shared/components/confirm-dialog/confirm-dialog';
+import { EntryDialog, EntryDialogData, EntryDialogResult } from '../../components/entry-dialog/entry-dialog';
 
 interface SearchQuery {
   filter: BatchFilter;
@@ -25,7 +26,7 @@ const EMPTY_RESULT: PageResult<Batch> = { items: [], total: 0 };
 
 @Component({
   selector: 'app-batch-search',
-  imports: [PageHeader, BatchFilters, BatchTable, MatProgressBarModule, MatButtonModule, MatPaginatorModule, BatchActions],
+  imports: [PageHeader, BatchFilters, BatchTable, MatProgressBarModule, MatButtonModule, MatPaginatorModule, BatchActions,],
   templateUrl: './batch-search.html',
   styleUrl: './batch-search.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -120,8 +121,9 @@ export class BatchSearch {
       case 'delete':
         return this.confirmDelete(selected[0]);
       case 'create':
+        return this.createBatch();
       case 'edit':
-        return this.notify('Disponível na próxima etapa.'); // Step 9
+        return this.editBatch(selected[0]);
       case 'view':
       case 'viewJustification':
         return this.notify('Funcionalidade fora do escopo deste desafio.');
@@ -167,6 +169,45 @@ export class BatchSearch {
 
   private notify(message: string): void {
     this.snackBar.open(message, 'Fechar', { duration: 4000 });
+  }
+
+  private createBatch(): void {
+    const request$ = this.batchService.create().pipe(
+      switchMap((batch) =>
+        this.openEntryDialog(batch).pipe(
+          switchMap((result) =>
+            result.entries.length > 0
+              ? this.batchService.updateTotals(batch.id, result.entries)
+              : this.batchService.remove(batch.id).pipe(ignoreElements()),
+          ),
+        ),
+      ),
+    );
+    this.runAction(request$, 'Lote incluído com sucesso.');
+  }
+
+  private editBatch(batch: Batch): void {
+    if (batch.status !== 'OPEN') {
+      this.notify('Apenas lotes abertos podem ser alterados.');
+      return;
+    }
+    const request$ = this.openEntryDialog(batch).pipe(
+      filter((result) => result.changed),
+      switchMap((result) => this.batchService.updateTotals(batch.id, result.entries)),
+    );
+    this.runAction(request$, `Lote ${batch.id} atualizado com sucesso.`);
+  }
+
+  private openEntryDialog(batch: Batch) {
+    return this.dialog
+      .open<EntryDialog, EntryDialogData, EntryDialogResult>(EntryDialog, {
+        data: { batch },
+        width: '960px',
+        maxWidth: '95vw',
+        autoFocus: 'first-tabbable',
+      })
+      .afterClosed()
+      .pipe(map((result) => result ?? { entries: [], changed: false }));
   }
 }
 
