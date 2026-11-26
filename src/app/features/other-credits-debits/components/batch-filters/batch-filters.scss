@@ -1,0 +1,53 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
+.filters-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-4);
+  align-items: start;
+  padding-top: var(--space-2);
+
+  @include bp.below(bp.$lg) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include bp.below(bp.$md) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+fieldset {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  margin-bottom: var(--space-1);
+  padding: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.filters-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.date-range-field {
+  grid-column: 1 / -1;
+}

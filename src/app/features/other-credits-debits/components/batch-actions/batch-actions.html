@@ -1,4 +1,4 @@
-<div role="group" aria-label="Ações dos lotes">
+<div class="actions-bar" role="group" aria-label="Ações dos lotes">
   <button mat-stroked-button type="button" [disabled]="busy() || !canConfirm()" (click)="trigger('confirm')">
     Confirmar
   </button>
@@ -21,5 +21,5 @@
     Visualizar
   </button>
 
-  <span aria-live="polite">{{ count() }} lote(s) selecionado(s)</span>
+  <span aria-live="polite" class="actions-bar__count">{{ count() }} lote(s) selecionado(s)</span>
 </div>
