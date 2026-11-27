@@ -87,7 +87,7 @@
       </div>
     </section>
 
-    <!-- Documento CSC -->
+    <!-- Documento CSC (simplified: event lookup is out of scope) -->
     <section class="dialog-section" aria-labelledby="section-csc">
       <h3 id="section-csc">Documento CSC</h3>
 
@@ -95,11 +95,35 @@
         <mat-form-field>
           <mat-label>PA</mat-label>
           <mat-select formControlName="branch">
-            <mat-option [value]="null">Nenhum</mat-option>
             @for (option of branchOptions; track option.value) {
               <mat-option [value]="option.value">{{ option.label }}</mat-option>
             }
           </mat-select>
+          <mat-error>{{ messageFor(controls.branch) }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>ID Evento</mat-label>
+          <input matInput formControlName="eventId" inputmode="numeric" maxlength="6" />
+          <mat-error>{{ messageFor(controls.eventId) }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>ID Doc CSC</mat-label>
+          <input matInput formControlName="cscDocumentId" inputmode="numeric" maxlength="10" />
+          <mat-error>{{ messageFor(controls.cscDocumentId) }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="span-full">
+          <mat-label>Compl. Histórico</mat-label>
+          <textarea matInput formControlName="historyComplement" rows="3" maxlength="200"></textarea>
+          <mat-hint align="end">{{ controls.historyComplement.value.length }}/200</mat-hint>
+          <mat-error>{{ messageFor(controls.historyComplement) }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Situação</mat-label>
+          <input matInput [value]="cscStatusLabel" readonly tabindex="-1" />
         </mat-form-field>
       </div>
     </section>

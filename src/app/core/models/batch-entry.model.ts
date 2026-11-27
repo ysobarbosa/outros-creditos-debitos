@@ -19,6 +19,10 @@ export interface BatchEntry {
   status: EntryStatus;
   /** PA (Posto de Atendimento) */
   branch: string | null;
+  /** Documento CSC (simplified) */
+  eventId: string | null;
+  historyComplement: string;
+  cscDocumentId: string | null;
 }
 
 /** Form payload: id, batchId and status are assigned by the service. */
