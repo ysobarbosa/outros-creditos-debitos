@@ -31,7 +31,7 @@ export class BatchFilters {
   private readonly formBuilder = inject(FormBuilder);
 
   readonly loading = input(false);
-  readonly filterApplied = output<BatchFilter>()
+  readonly filterApplied = output<BatchFilter>();
 
   protected readonly statusOptions = BATCH_STATUS_OPTIONS;
   protected readonly rangeMatcher = new RangeErrorStateMatcher();
@@ -39,7 +39,7 @@ export class BatchFilters {
   protected readonly form = this.formBuilder.group({
     responsibleInstitution: this.formBuilder.control<string | null>(null, Validators.pattern(INSTITUTION_PATTERN)),
     institution: this.formBuilder.control<string | null>(null, Validators.pattern(INSTITUTION_PATTERN)),
-    status: this.formBuilder.control<BatchStatusFilter>('ALL'),
+    status: this.formBuilder.nonNullable.control<BatchStatusFilter>('ALL'),
     idRange: this.rangeGroup<number>(Validators.min(1)),
     amountRange: this.rangeGroup<number>(Validators.min(0)),
     dateRange: this.rangeGroup<Date>(),
@@ -52,7 +52,7 @@ export class BatchFilters {
       this.form.markAllAsTouched();
       return;
     }
-    this.filterApplied.emit(this.form.getRawValue())
+    this.filterApplied.emit(this.form.getRawValue());
   }
 
   protected clear(): void {
