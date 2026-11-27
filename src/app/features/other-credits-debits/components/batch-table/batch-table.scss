@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 :host {
   display: block;
   overflow-x: auto;
@@ -8,11 +10,18 @@
   min-width: 960px;
 }
 
-th {
-  background: var(--color-primary-light);
-  color: var(--color-primary-dark);
+.batches-table th {
+  background: var(--color-table-header-bg);
+  color: var(--color-table-header-text);
   font-weight: 600;
   white-space: nowrap;
+
+  // Keep the header checkbox readable on the dark background
+  @include mat.checkbox-overrides((
+    unselected-icon-color: var(--color-table-header-text),
+    selected-icon-color: var(--color-table-header-text),
+    selected-checkmark-color: var(--color-table-header-bg),
+  ));
 }
 
 td {
