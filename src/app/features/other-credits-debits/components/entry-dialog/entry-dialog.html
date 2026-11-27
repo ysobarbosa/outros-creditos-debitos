@@ -1,6 +1,13 @@
-<h2 mat-dialog-title>Incluir Lançamento — Lote {{ data.batch.id }}</h2>
+<h2 mat-dialog-title>
+  @switch (mode()) {
+    @case ('edit') { Alterar Lançamento }
+    @case ('view') { Visualizar Lançamento }
+    @default { Incluir Lançamento }
+  }
+  — Lote {{ data.batch.id }}
+</h2>
 
-<form [formGroup]="form" (ngSubmit)="addEntry()" novalidate>
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
   <mat-dialog-content>
     <!-- Conta Corrente -->
     <section class="dialog-section" aria-labelledby="section-account">
@@ -101,12 +108,33 @@
       <p class="dialog-error" role="alert">{{ message }}</p>
     }
 
-    <!-- Step 10: entries grid -->
-    <p class="dialog-summary" aria-live="polite">{{ entries().length }} lançamento(s) neste lote.</p>
+   <section class="dialog-section" aria-labelledby="section-entries">
+  <h3 id="section-entries">Lançamentos do Lote ({{ entries().length }})</h3>
+
+  <div class="entries-actions" role="group" aria-label="Ações dos lançamentos">
+    <button mat-stroked-button type="button" [disabled]="!canActOnSelection()" (click)="view()">Visualizar</button>
+    <button mat-stroked-button type="button" [disabled]="!canActOnSelection()" (click)="edit()">Alterar</button>
+    <button mat-stroked-button type="button" [disabled]="!canActOnSelection()" (click)="remove()">Excluir</button>
+    <button mat-stroked-button type="button" [disabled]="!canActOnSelection()" (click)="duplicate()">Duplicar</button>
+  </div>
+
+  <app-entry-table [entries]="entries()" [(selectedId)]="selectedId" [disabled]="mode() !== 'create'" />
+</section>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="close()">Fechar</button>
-    <button mat-flat-button type="submit" [disabled]="saving()">Incluir</button>
-  </mat-dialog-actions>
+  @switch (mode()) {
+    @case ('edit') {
+      <button mat-button type="button" (click)="backToCreate()">Cancelar</button>
+      <button mat-flat-button type="submit" [disabled]="saving()">Salvar alteração</button>
+    }
+    @case ('view') {
+      <button mat-button type="button" (click)="backToCreate()">Voltar</button>
+    }
+    @default {
+      <button mat-flat-button type="submit" [disabled]="saving()">Incluir</button>
+    }
+  }
+  <button mat-button type="button" (click)="close()">Fechar</button>
+</mat-dialog-actions>
 </form>
