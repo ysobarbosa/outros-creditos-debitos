@@ -72,6 +72,8 @@ export class EntryDialog {
   protected readonly entries = signal<BatchEntry[]>([]);
   protected readonly searchingAccount = signal(false);
   protected readonly saving = signal(false);
+  /** Screen preference (not entry data): keep the form filled after including. */
+  protected readonly keepData = signal(false);
   protected readonly error = signal<string | null>(null);
   private changed = false;
   protected readonly mode = signal<FormMode>('create');
@@ -161,7 +163,11 @@ export class EntryDialog {
     const updated: BatchEntry = { ...this.editingEntry, ...this.toNewEntry() };
     this.applyEntries(this.entryService.update(this.data.batch.id, updated), () => this.backToCreate());
   } else {
-    this.applyEntries(this.entryService.add(this.data.batch.id, this.toNewEntry()), () => this.resetForm());
+    this.applyEntries(this.entryService.add(this.data.batch.id, this.toNewEntry()), () => {
+      if (!this.keepData()) {
+        this.resetForm();
+      }
+    });
   }
 }
 

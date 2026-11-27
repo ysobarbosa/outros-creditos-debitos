@@ -147,6 +147,12 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
+  @if (mode() === 'create') {
+    <mat-checkbox class="keep-data" [checked]="keepData()" (change)="keepData.set($event.checked)">
+      Manter dados na tela
+    </mat-checkbox>
+  }
+
   @switch (mode()) {
     @case ('edit') {
       <button mat-button type="button" (click)="backToCreate()">Cancelar</button>
