@@ -18,7 +18,7 @@ const MAX_DIGITS = 15;
     type: 'text',
     inputmode: 'numeric',
     autocomplete: 'off',
-    placeholder: '0.00',
+    placeholder: 'R$ 0,00',
     '(input)': 'onInput()',
     '(blur)': 'onTouched()',
   },
@@ -27,8 +27,9 @@ export class CurrencyInputDirective implements ControlValueAccessor {
   private readonly input: HTMLInputElement = inject(ElementRef).nativeElement;
   private readonly locale = inject(LOCALE_ID);
 
-  private onChange: (value: number | null) => void = () => {};
-  onTouched: () => void = () => {};
+  // No-op until Angular registers the real callbacks
+  private onChange: (value: number | null) => void = () => undefined;
+  onTouched: () => void = () => undefined;
 
   writeValue(value: number | null): void {
     this.input.value = value == null ? '' : this.format(value);

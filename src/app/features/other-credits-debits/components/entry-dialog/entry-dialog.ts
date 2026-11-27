@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, FormGroupDirective, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -31,6 +31,9 @@ export interface EntryDialogResult {
 }
 
 const ACCOUNT_PATTERN = /^\d{5}$/;
+const EVENT_ID_PATTERN = /^\d{1,6}$/;
+const CSC_DOCUMENT_ID_PATTERN = /^\d{1,10}$/;
+const CSC_STATUS_LABEL = 'Aguardando Processamento CCO';
 type FormMode = 'create' | 'edit' | 'view';
 
 @Component({
@@ -64,10 +67,13 @@ export class EntryDialog {
   protected readonly historyOptions = HISTORY_OPTIONS_MOCK;
   protected readonly branchOptions = BRANCH_OPTIONS_MOCK;
   protected readonly pendingLabel = ENTRY_STATUS_LABEL.PENDING;
+  protected readonly cscStatusLabel = CSC_STATUS_LABEL;
 
   protected readonly entries = signal<BatchEntry[]>([]);
   protected readonly searchingAccount = signal(false);
   protected readonly saving = signal(false);
+  /** Screen preference (not entry data): keep the form filled after including. */
+  protected readonly keepData = signal(false);
   protected readonly error = signal<string | null>(null);
   private changed = false;
   protected readonly mode = signal<FormMode>('create');
@@ -88,7 +94,10 @@ export class EntryDialog {
     isReversal: this.fb.nonNullable.control(false),
     document: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(20)]),
     description: this.fb.control<string | null>(null, Validators.maxLength(200)),
-    branch: this.fb.control<string | null>(null),
+    branch: this.fb.control<string | null>(null, Validators.required),
+    eventId: this.fb.control<string | null>(null, Validators.pattern(EVENT_ID_PATTERN)),
+    historyComplement: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(200)]),
+    cscDocumentId: this.fb.control<string | null>(null, Validators.pattern(CSC_DOCUMENT_ID_PATTERN)),
   });
 
   protected readonly controls = this.form.controls;
@@ -154,7 +163,11 @@ export class EntryDialog {
     const updated: BatchEntry = { ...this.editingEntry, ...this.toNewEntry() };
     this.applyEntries(this.entryService.update(this.data.batch.id, updated), () => this.backToCreate());
   } else {
-    this.applyEntries(this.entryService.add(this.data.batch.id, this.toNewEntry()), () => this.resetForm());
+    this.applyEntries(this.entryService.add(this.data.batch.id, this.toNewEntry()), () => {
+      if (!this.keepData()) {
+        this.resetForm();
+      }
+    });
   }
 }
 
@@ -249,6 +262,9 @@ private applyEntries(request$: Observable<BatchEntry[]>, afterSuccess?: () => vo
       document: value.document.trim(),
       description: value.description?.trim() || null,
       branch: value.branch,
+      eventId: value.eventId?.trim() || null,
+      historyComplement: value.historyComplement.trim(),
+      cscDocumentId: value.cscDocumentId?.trim() || null,
     };
   }
 }
