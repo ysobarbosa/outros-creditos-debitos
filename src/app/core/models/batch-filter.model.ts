@@ -6,7 +6,7 @@ export type BatchStatusFilter = BatchStatus | 'ALL';
 export interface BatchFilter {
   responsibleInstitution: string | null;
   institution: string | null;
-  status: string | null;
+  status: BatchStatusFilter;
   idRange: Range<number>;
   amountRange: Range<number>;
   dateRange: Range<Date>;
