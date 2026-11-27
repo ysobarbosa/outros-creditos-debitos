@@ -1,0 +1,37 @@
+:host {
+  display: block;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.entries-table {
+  width: 100%;
+  min-width: 720px;
+}
+
+th {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+td {
+  white-space: nowrap;
+}
+
+.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+tr.is-selected td {
+  background: var(--color-primary-light);
+}
+
+.no-data {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+}
