@@ -18,7 +18,7 @@ const MAX_DIGITS = 15;
     type: 'text',
     inputmode: 'numeric',
     autocomplete: 'off',
-    placeholder: '0.00',
+    placeholder: 'R$ 0,00',
     '(input)': 'onInput()',
     '(blur)': 'onTouched()',
   },
